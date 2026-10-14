@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Spend Sense</title>
+  <meta name="description" content="Log in or create a free Spend Sense account to start tracking your student allowance." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+
+<div class="auth-page">
+
+  <!-- ── Left: Branding Panel ───────────────────────── -->
+  <aside class="auth-brand" aria-label="Spend Sense branding">
+    <div class="auth-brand__logo">
+      <div class="auth-brand__logo-icon" aria-hidden="true">💰</div>
+      <span class="auth-brand__logo-name">Spend Sense</span>
+    </div>
+
+    <h1 class="auth-brand__headline">
+      Your money.<br>Your rules.<br>Your clarity.
+    </h1>
+    <p class="auth-brand__sub">
+      The simplest budget tracker built for college students who want to stop running out of money halfway through the month.
+    </p>
+
+    <div class="auth-brand__perks">
+      <div class="auth-perk">
+        <div class="auth-perk__icon" aria-hidden="true">✓</div>
+        <span>Daily safe-to-spend limits, automatically calculated</span>
+      </div>
+      <div class="auth-perk">
+        <div class="auth-perk__icon" aria-hidden="true">✓</div>
+        <span>Track Food, Transit &amp; Fun spending effortlessly</span>
+      </div>
+      <div class="auth-perk">
+        <div class="auth-perk__icon" aria-hidden="true">✓</div>
+        <span>100% free — no credit card, no ads, no nonsense</span>
+      </div>
+      <div class="auth-perk">
+        <div class="auth-perk__icon" aria-hidden="true">✓</div>
+        <span>Private &amp; secure — only you see your data</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Right: Form Panel ──────────────────────────── -->
+  <main class="auth-form-panel" aria-labelledby="auth-form-heading">
+    <div class="auth-form-box page-fade">
+
+      <div id="auth-form-heading" aria-live="polite">
+        <h2 class="auth-form-box__title">Welcome back 👋</h2>
+        <p class="auth-form-box__sub">Log in or create a free account below.</p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="auth-tabs" role="tablist" aria-label="Login or Sign up">
+        <button class="auth-tab active" id="tab-login" role="tab" aria-selected="true" aria-controls="section-login">
+          Log In
+        </button>
+        <button class="auth-tab" id="tab-signup" role="tab" aria-selected="false" aria-controls="section-signup">
+          Sign Up
+        </button>
+      </div>
+
+      <!-- ── Login Section ────────────────────────────── -->
+      <div class="auth-section active" id="section-login" role="tabpanel" aria-labelledby="tab-login">
+        <div class="alert" id="login-alert" role="alert" aria-live="polite"></div>
+
+        <form class="auth-form" id="login-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email Address</label>
+            <input
+              class="form-input"
+              type="email"
+              id="login-email"
+              name="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <div class="input-group">
+              <input
+                class="form-input"
+                type="password"
+                id="login-password"
+                name="password"
+                placeholder="Your password"
+                autocomplete="current-password"
+                required
+              />
+              <button type="button" class="input-group__toggle" aria-label="Toggle password visibility">👁️</button>
+            </div>
+          </div>
+
+          <div class="auth-form__footer">
+            <span></span>
+            <button type="button" class="auth-form__link" id="forgot-link">Forgot password?</button>
+          </div>
+
+          <button class="btn btn--primary btn--full" type="submit" id="login-btn">
+            <span class="btn-text">Log In</span>
+            <div class="spinner" id="login-spinner" aria-hidden="true"></div>
+          </button>
+        </form>
+
+        <div class="divider--text" style="margin-top:var(--space-5)">
+          Don't have an account?
+          <button type="button" class="auth-form__link" id="switch-to-signup"
+            onclick="document.getElementById('tab-signup').click()">
+            Sign up free
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Sign Up Section ──────────────────────────── -->
+      <div class="auth-section" id="section-signup" role="tabpanel" aria-labelledby="tab-signup">
+        <div class="alert" id="signup-alert" role="alert" aria-live="polite"></div>
+
+        <form class="auth-form" id="signup-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="signup-email">Email Address</label>
+            <input
+              class="form-input"
+              type="email"
+              id="signup-email"
+              name="email"
+              placeholder="you@college.edu"
+              autocomplete="email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-password">Password</label>
+            <div class="input-group">
+              <input
+                class="form-input"
+                type="password"
+                id="signup-password"
+                name="new-password"
+                placeholder="Min. 6 characters"
+                autocomplete="new-password"
+                required
+                minlength="6"
+              />
+              <button type="button" class="input-group__toggle" aria-label="Toggle password visibility">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-confirm">Confirm Password</label>
+            <div class="input-group">
+              <input
+                class="form-input"
+                type="password"
+                id="signup-confirm"
+                name="confirm-password"
+                placeholder="Repeat your password"
+                autocomplete="new-password"
+                required
+              />
+              <button type="button" class="input-group__toggle" aria-label="Toggle confirm password visibility">👁️</button>
+            </div>
+          </div>
+
+          <button class="btn btn--primary btn--full" type="submit" id="signup-btn">
+            <span class="btn-text">Create Free Account</span>
+            <div class="spinner" id="signup-spinner" aria-hidden="true"></div>
+          </button>
+
+          <p class="text-xs text-muted text-center" style="margin-top:var(--space-3)">
+            By signing up you agree to use this responsibly 😄 No hidden terms.
+          </p>
+        </form>
+      </div>
+
+      <!-- ── Forgot Password Panel ─────────────────────── -->
+      <div class="forgot-panel" id="forgot-panel" aria-live="polite">
+        <button type="button" class="forgot-panel__back" id="forgot-back">← Back to Login</button>
+
+        <h3 style="font-size:var(--font-size-lg);font-weight:700;margin-bottom:var(--space-2);">Reset Password</h3>
+        <p style="font-size:var(--font-size-sm);color:var(--color-text-secondary);margin-bottom:var(--space-5);">
+          Enter your email and we'll send you a reset link.
+        </p>
+
+        <div class="alert" id="forgot-alert" role="alert" aria-live="polite"></div>
+
+        <form class="auth-form" id="forgot-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="forgot-email">Email Address</label>
+            <input
+              class="form-input"
+              type="email"
+              id="forgot-email"
+              placeholder="you@example.com"
+              autocomplete="email"
+            />
+          </div>
+          <button class="btn btn--primary btn--full" type="submit" id="forgot-btn">
+            <span class="btn-text">Send Reset Email</span>
+            <div class="spinner" id="forgot-spinner" aria-hidden="true"></div>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { initAuthPage } from './js/auth.js';
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('.page-fade').classList.add('visible');
+    initAuthPage();
+  });
+</script>
+
+</body>
+</html>

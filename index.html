@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spend Sense — Smart Budget Tracker for Students</title>
+  <meta name="description" content="Spend Sense helps college students track their monthly allowance, log daily expenses in Food, Transit, and Fun, and stay on top of their budget with daily safe-to-spend limits." />
+  <meta name="theme-color" content="#3D8B6B" />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Spend Sense — Smart Budget Tracker for Students" />
+  <meta property="og:description" content="Never run out of pocket money again. Track your allowance and see exactly how much is safe to spend each day." />
+  <meta property="og:type"        content="website" />
+
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+</head>
+<body>
+
+<!-- ── Navigation ───────────────────────────────────── -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo" aria-label="Spend Sense home">
+        <div class="nav__logo-icon" aria-hidden="true">💰</div>
+        Spend Sense
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="auth.html" class="btn btn--ghost btn--sm hide-mobile" id="nav-login-btn">Log In</a>
+        <a href="auth.html" class="btn btn--primary btn--sm" id="nav-signup-btn">Get Started Free</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────── -->
+<main>
+<section class="hero page-fade" aria-labelledby="hero-heading">
+  <div class="container">
+    <div class="hero__inner">
+
+      <!-- Left: Copy -->
+      <div>
+        <div class="hero__tag" aria-label="New product">
+          <span>🎓</span> Built for college students
+        </div>
+        <h1 class="hero__heading" id="hero-heading">
+          Stop wondering<br>where your<br>
+          <span>money went</span>
+        </h1>
+        <p class="hero__subheading">
+          Set your monthly allowance, log daily expenses across Food, Transit &amp; Fun,
+          and get a personalised <strong>safe-to-spend</strong> limit every day.
+        </p>
+        <div class="hero__actions">
+          <a href="auth.html" class="btn btn--primary btn--lg" id="hero-cta-primary">
+            Start Tracking Free
+          </a>
+          <a href="#how-it-works" class="btn btn--outline btn--lg" id="hero-cta-secondary">
+            See How It Works
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: App Mockup -->
+      <div class="hero__visual" aria-hidden="true">
+        <div class="hero__mockup card card--raised">
+
+          <!-- Floating chips -->
+          <div class="mockup__chip mockup__chip--1">✅ Under budget today!</div>
+          <div class="mockup__chip mockup__chip--2">🎯 ₹247 safe to spend</div>
+
+          <div class="mockup__header">
+            <span class="mockup__title">October Budget</span>
+            <span class="mockup__month">2026</span>
+          </div>
+
+          <!-- Ring + Safe to Spend -->
+          <div class="mockup__budget-ring">
+            <svg class="ring-chart" id="ring-chart-svg" aria-label="Budget ring chart"></svg>
+            <div class="mockup__budget-info">
+              <div class="mockup__safe-label">Safe to Spend Today</div>
+              <div class="mockup__safe-amount">₹247</div>
+              <div class="mockup__safe-sub">17 days left · ₹4,199 remaining</div>
+            </div>
+          </div>
+
+          <!-- Category Bars -->
+          <div class="mockup__bars">
+            <div class="mockup__bar-row">
+              <span class="mockup__bar-label">🍔 Food</span>
+              <div class="mockup__bar-track">
+                <div class="mockup__bar-fill mockup__bar-fill--food" data-width="62%" style="width:0"></div>
+              </div>
+              <span class="mockup__bar-val">₹1,240</span>
+            </div>
+            <div class="mockup__bar-row">
+              <span class="mockup__bar-label">🚌 Transit</span>
+              <div class="mockup__bar-track">
+                <div class="mockup__bar-fill mockup__bar-fill--transit" data-width="38%" style="width:0"></div>
+              </div>
+              <span class="mockup__bar-val">₹761</span>
+            </div>
+            <div class="mockup__bar-row">
+              <span class="mockup__bar-label">🎉 Fun</span>
+              <div class="mockup__bar-track">
+                <div class="mockup__bar-fill mockup__bar-fill--fun" data-width="25%" style="width:0"></div>
+              </div>
+              <span class="mockup__bar-val">₹500</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Stats Strip ───────────────────────────────────── -->
+<section class="stats-strip" aria-label="Product statistics">
+  <div class="container">
+    <div class="stats-strip__inner">
+      <div class="stat reveal">
+        <div class="stat__number" data-count="3" data-suffix=" categories" aria-label="3 spending categories">3</div>
+        <div class="stat__label">Smart spending categories</div>
+      </div>
+      <div class="stat reveal reveal-delay-1">
+        <div class="stat__number" data-prefix="₹" data-count="0" aria-label="Zero cost">₹0</div>
+        <div class="stat__label">Forever free, no credit card</div>
+      </div>
+      <div class="stat reveal reveal-delay-2">
+        <div class="stat__number" data-count="100" data-suffix="%" aria-label="100% secure">100%</div>
+        <div class="stat__label">Private &amp; secure cloud storage</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ──────────────────────────────────────── -->
+<section class="features" aria-labelledby="features-heading">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">Features</div>
+      <h2 class="section-heading" id="features-heading">Everything you need, nothing you don't</h2>
+      <p class="section-subheading">Designed for students — simple, fast, and powerful enough to actually change your habits.</p>
+    </div>
+    <div class="features__grid">
+      <article class="feature-card reveal">
+        <div class="feature-card__icon feature-card__icon--green">📊</div>
+        <h3 class="feature-card__title">Daily Safe-to-Spend</h3>
+        <p class="feature-card__desc">
+          See exactly how much you can spend today based on your remaining balance and days left in the month. No guessing.
+        </p>
+      </article>
+      <article class="feature-card reveal reveal-delay-1">
+        <div class="feature-card__icon feature-card__icon--amber">⚡</div>
+        <h3 class="feature-card__title">One-tap Expense Logging</h3>
+        <p class="feature-card__desc">
+          Log any expense in seconds. Pick Food, Transit, or Fun — add an optional note and you're done.
+        </p>
+      </article>
+      <article class="feature-card reveal reveal-delay-2">
+        <div class="feature-card__icon feature-card__icon--blue">☁️</div>
+        <h3 class="feature-card__title">Synced Across Devices</h3>
+        <p class="feature-card__desc">
+          Your data lives in the cloud. Log from your phone in class, check on your laptop at home — always up to date.
+        </p>
+      </article>
+      <article class="feature-card reveal">
+        <div class="feature-card__icon feature-card__icon--green">🎯</div>
+        <h3 class="feature-card__title">Category Breakdown</h3>
+        <p class="feature-card__desc">
+          Visual bars show how much of your spending goes to Food, Transit, and Fun — so you know exactly where to cut back.
+        </p>
+      </article>
+      <article class="feature-card reveal reveal-delay-1">
+        <div class="feature-card__icon feature-card__icon--amber">🔒</div>
+        <h3 class="feature-card__title">Secure Login System</h3>
+        <p class="feature-card__desc">
+          Your account is private and password-protected. Only you can see your data.
+        </p>
+      </article>
+      <article class="feature-card reveal reveal-delay-2">
+        <div class="feature-card__icon feature-card__icon--blue">📅</div>
+        <h3 class="feature-card__title">Monthly Reset</h3>
+        <p class="feature-card__desc">
+          Start each month fresh. Update your allowance, clear old expenses, and get a new daily safe-to-spend limit.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ── How It Works ──────────────────────────────────── -->
+<section class="how-it-works" id="how-it-works" aria-labelledby="hiw-heading">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">How It Works</div>
+      <h2 class="section-heading" id="hiw-heading">Up and running in 60 seconds</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step__number" aria-hidden="true">1</div>
+        <h3 class="step__title">Create Your Account</h3>
+        <p class="step__desc">Sign up free with your email. No credit card, no subscription — just a quick account setup.</p>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step__number" aria-hidden="true">2</div>
+        <h3 class="step__title">Set Your Allowance</h3>
+        <p class="step__desc">Enter your total monthly allowance once. Spend Sense calculates your daily limit automatically.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step__number" aria-hidden="true">3</div>
+        <h3 class="step__title">Log &amp; Track Daily</h3>
+        <p class="step__desc">Each time you spend, tap the category and enter the amount. Watch your safe-to-spend update instantly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ───────────────────────────────────────────── -->
+<section class="cta-section reveal" aria-labelledby="cta-heading">
+  <div class="container container--sm">
+    <h2 class="cta-section__heading" id="cta-heading">
+      Ready to take control of your money?
+    </h2>
+    <p class="cta-section__sub">
+      Free forever. No ads. No hidden fees. Just smarter spending.
+    </p>
+    <a href="auth.html" class="btn btn--primary btn--lg" id="cta-main-btn">
+      Create Free Account →
+    </a>
+  </div>
+</section>
+</main>
+
+<!-- ── Footer ────────────────────────────────────────── -->
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__copy">© 2026 Spend Sense. Made for students, by students.</div>
+      <nav class="footer__links" aria-label="Footer navigation">
+        <a href="auth.html" id="footer-login">Log In</a>
+        <a href="auth.html" id="footer-signup">Sign Up</a>
+        <a href="dashboard.html" id="footer-app">Dashboard</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script src="js/landing.js"></script>
+</body>
+</html>

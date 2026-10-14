@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile &amp; Settings — Spend Sense</title>
+  <meta name="description" content="Manage your Spend Sense account settings, update your monthly allowance, and reset your data." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+
+<div class="dashboard-page page-fade">
+
+  <!-- ── Navigation ─────────────────────────────────── -->
+  <nav class="dashboard-nav" role="navigation" aria-label="Dashboard navigation">
+    <div class="container">
+      <div class="dashboard-nav__inner">
+        <a href="dashboard.html" class="dashboard-nav__logo" aria-label="Back to dashboard">
+          <div class="dashboard-nav__logo-icon" aria-hidden="true">💰</div>
+          Spend Sense
+        </a>
+
+        <div class="dashboard-nav__right">
+          <div style="position:relative;">
+            <div class="user-avatar" id="user-avatar" role="button" aria-label="User menu" aria-haspopup="true" tabindex="0">U</div>
+            <div class="user-dropdown" id="user-dropdown" role="menu">
+              <div class="user-dropdown__header">
+                <div class="text-xs font-semibold" style="color:var(--color-text-primary);margin-bottom:2px;">Signed in as</div>
+                <div class="user-dropdown__email" id="nav-user-email">loading…</div>
+              </div>
+              <a href="dashboard.html" class="user-dropdown__item" role="menuitem">📊 Dashboard</a>
+              <button class="user-dropdown__item user-dropdown__item--danger" id="nav-signout" role="menuitem">
+                🚪 Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Profile Main ───────────────────────────────── -->
+  <main class="dashboard-main" aria-label="Profile settings">
+    <div class="container">
+      <div class="profile-page">
+
+        <!-- Page Header -->
+        <div style="margin-bottom:var(--space-8);">
+          <a href="dashboard.html" class="btn btn--ghost btn--sm" style="margin-bottom:var(--space-4);padding-left:0;"
+            id="back-to-dashboard">← Back to Dashboard</a>
+          <h1 class="text-2xl font-extrabold" style="letter-spacing:-0.02em;">Profile &amp; Settings</h1>
+          <p class="text-muted text-md" style="margin-top:var(--space-2);">Manage your account and budget preferences.</p>
+        </div>
+
+        <!-- Global Alert -->
+        <div class="alert" id="profile-alert" role="alert" aria-live="polite" style="margin-bottom:var(--space-4);"></div>
+
+        <!-- ── Account Info ──────────────────────────── -->
+        <section class="profile-section">
+          <div class="profile-section__title">Account</div>
+          <div class="card">
+            <div class="flex items-center gap-4">
+              <div style="width:52px;height:52px;border-radius:50%;background:var(--color-primary-faint);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--color-primary);flex-shrink:0;" id="profile-avatar" aria-hidden="true">U</div>
+              <div>
+                <div class="font-semibold" id="profile-email" style="margin-bottom:4px;">—</div>
+                <div class="text-sm text-muted">Your email address</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Update Allowance ─────────────────────── -->
+        <section class="profile-section">
+          <div class="profile-section__title">Monthly Allowance</div>
+          <div class="card">
+            <p class="text-sm text-secondary" style="margin-bottom:var(--space-4);">
+              Update your total monthly allowance. This resets your safe-to-spend calculation from today.
+            </p>
+            <form id="update-allowance-form" class="flex gap-3" novalidate>
+              <div class="form-group" style="flex:1;">
+                <label class="form-label" for="new-allowance">New Allowance (₹)</label>
+                <div class="amount-input-wrapper">
+                  <span class="amount-currency" aria-hidden="true">₹</span>
+                  <input
+                    class="form-input"
+                    type="number"
+                    id="new-allowance"
+                    placeholder="e.g. 6000"
+                    min="1"
+                    step="100"
+                    required
+                    aria-label="Monthly allowance in rupees"
+                  />
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-end;">
+                <button class="btn btn--primary" type="submit" id="update-allowance-btn">Update</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ── Data Management ──────────────────────── -->
+        <section class="profile-section">
+          <div class="profile-section__title">Data Management</div>
+          <div class="card danger-zone">
+            <h3 class="font-semibold" style="margin-bottom:var(--space-2);">Reset All Expenses</h3>
+            <p class="text-sm text-secondary" style="margin-bottom:var(--space-5);">
+              This will permanently delete <strong>all your logged expenses</strong>. Your allowance setting will be kept. Use this at the start of a new month.
+            </p>
+            <button class="btn btn--danger" id="reset-month-btn">
+              Reset Current Month
+            </button>
+          </div>
+        </section>
+
+        <!-- ── Sign Out ──────────────────────────────── -->
+        <section class="profile-section">
+          <div class="profile-section__title">Session</div>
+          <div class="card">
+            <p class="text-sm text-secondary" style="margin-bottom:var(--space-4);">
+              You are currently logged in. Sign out to switch accounts or end your session.
+            </p>
+            <button class="btn btn--outline" id="profile-signout">Sign Out</button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toast-container" role="status" aria-live="polite"></div>
+</div>
+
+<script type="module">
+  import { initProfile } from './js/dashboard.js';
+  import { auth } from './js/firebase-config.js';
+
+  (async () => {
+    await initProfile();
+    const user = auth.currentUser;
+    if (user) {
+      document.getElementById('profile-email').textContent = user.email;
+      document.getElementById('profile-avatar').textContent = user.email[0].toUpperCase();
+    }
+  })().catch(console.error);
+</script>
+
+</body>
+</html>

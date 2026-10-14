@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Spend Sense</title>
+  <meta name="description" content="Your personal budget dashboard. Track spending, see daily safe-to-spend limits, and log expenses." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+
+<div class="dashboard-page page-fade">
+
+  <!-- ── Navigation ─────────────────────────────────── -->
+  <nav class="dashboard-nav" role="navigation" aria-label="Dashboard navigation">
+    <div class="container">
+      <div class="dashboard-nav__inner">
+        <a href="index.html" class="dashboard-nav__logo" aria-label="Spend Sense home">
+          <div class="dashboard-nav__logo-icon" aria-hidden="true">💰</div>
+          Spend Sense
+        </a>
+
+        <div class="dashboard-nav__right">
+          <span class="text-sm text-muted hide-mobile" id="nav-greeting"></span>
+
+          <div style="position:relative;">
+            <div class="user-avatar" id="user-avatar" role="button" aria-label="User menu" aria-haspopup="true" tabindex="0">
+              U
+            </div>
+            <div class="user-dropdown" id="user-dropdown" role="menu" aria-label="User options">
+              <div class="user-dropdown__header">
+                <div class="text-xs font-semibold" style="color:var(--color-text-primary);margin-bottom:2px;">Signed in as</div>
+                <div class="user-dropdown__email" id="nav-user-email">loading…</div>
+              </div>
+              <button class="user-dropdown__item" id="nav-profile" role="menuitem">
+                ⚙️ Settings &amp; Profile
+              </button>
+              <button class="user-dropdown__item user-dropdown__item--danger" id="nav-signout" role="menuitem">
+                🚪 Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main Content ───────────────────────────────── -->
+  <main class="dashboard-main" aria-label="Budget dashboard">
+    <div class="container">
+
+      <!-- Setup Banner -->
+      <div class="setup-banner" id="setup-banner" role="region" aria-label="First-time setup">
+        <h2 class="setup-banner__title">👋 Welcome to Spend Sense!</h2>
+        <p class="setup-banner__sub">Let's start by setting your total monthly allowance.</p>
+        <div class="setup-banner__form">
+          <input
+            class="setup-banner__input"
+            type="number"
+            id="allowance-input"
+            placeholder="e.g. 5000"
+            min="1"
+            step="100"
+            aria-label="Monthly allowance in rupees"
+          />
+          <button class="setup-banner__btn" id="allowance-save-btn">Save Allowance</button>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+
+        <!-- ── Left Column ─────────────────────────── -->
+        <div>
+
+          <!-- Budget Overview -->
+          <section class="card budget-overview" aria-labelledby="budget-overview-heading">
+            <div class="budget-overview__top">
+              <h2 class="text-md font-bold" id="budget-overview-heading">Budget Overview</h2>
+              <span class="budget-month" id="budget-month" aria-live="polite">—</span>
+            </div>
+
+            <div class="budget-stats" role="list">
+              <div class="budget-stat" role="listitem">
+                <div class="budget-stat__label">Total Allowance</div>
+                <div class="budget-stat__value budget-stat__value--primary" id="budget-total" aria-live="polite">₹—</div>
+              </div>
+              <div class="budget-stat" role="listitem">
+                <div class="budget-stat__label">Spent So Far</div>
+                <div class="budget-stat__value budget-stat__value--danger" id="budget-spent" aria-live="polite">₹0</div>
+              </div>
+              <div class="budget-stat" role="listitem">
+                <div class="budget-stat__label">Remaining</div>
+                <div class="budget-stat__value budget-stat__value--muted" id="budget-remaining" aria-live="polite">₹—</div>
+              </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="budget-progress" role="progressbar" aria-label="Budget used" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+              <div class="budget-progress__header">
+                <span>Budget used</span>
+                <span id="budget-pct" aria-live="polite">0%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="budget-progress-fill" style="width:0%"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Category Breakdown -->
+          <section class="card category-breakdown" aria-labelledby="cat-breakdown-heading" style="margin-top:var(--space-4);">
+            <h2 class="text-md font-bold" id="cat-breakdown-heading" style="margin-bottom:var(--space-4);">Category Breakdown</h2>
+
+            <div class="category-row">
+              <div class="category-row__header">
+                <div class="category-row__name">
+                  <span class="category-dot category-dot--food" aria-hidden="true"></span>
+                  🍔 Food
+                </div>
+                <span class="category-row__amount" id="cat-amt-food" aria-live="polite">₹0</span>
+              </div>
+              <div class="category-track">
+                <div class="category-fill category-fill--food" id="cat-bar-food" style="width:0%" aria-label="Food spending bar"></div>
+              </div>
+            </div>
+
+            <div class="category-row">
+              <div class="category-row__header">
+                <div class="category-row__name">
+                  <span class="category-dot category-dot--transit" aria-hidden="true"></span>
+                  🚌 Transit
+                </div>
+                <span class="category-row__amount" id="cat-amt-transit" aria-live="polite">₹0</span>
+              </div>
+              <div class="category-track">
+                <div class="category-fill category-fill--transit" id="cat-bar-transit" style="width:0%" aria-label="Transit spending bar"></div>
+              </div>
+            </div>
+
+            <div class="category-row">
+              <div class="category-row__header">
+                <div class="category-row__name">
+                  <span class="category-dot category-dot--fun" aria-hidden="true"></span>
+                  🎉 Fun
+                </div>
+                <span class="category-row__amount" id="cat-amt-fun" aria-live="polite">₹0</span>
+              </div>
+              <div class="category-track">
+                <div class="category-fill category-fill--fun" id="cat-bar-fun" style="width:0%" aria-label="Fun spending bar"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Expense History -->
+          <section class="expense-history" aria-labelledby="history-heading">
+            <div class="history-header">
+              <h2 class="history-title" id="history-heading">Recent Expenses</h2>
+            </div>
+            <div class="history-list" id="expense-list" aria-live="polite" aria-label="Expense history">
+              <div class="empty-state">
+                <div class="empty-state__icon">📋</div>
+                <div class="empty-state__text">No expenses yet — start logging!</div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- ── Right Column ────────────────────────── -->
+        <aside>
+
+          <!-- Safe-to-Spend Card -->
+          <div class="card safe-spend-card" role="region" aria-label="Daily safe to spend amount">
+            <div class="safe-spend-label">Daily Safe-to-Spend</div>
+            <div class="safe-spend-amount" id="safe-spend-amount" aria-live="polite">₹—</div>
+            <div class="safe-spend-sub">today's recommended limit</div>
+            <div class="safe-spend-days" id="safe-spend-days" aria-live="polite">
+              <span>📅</span> <span>— days left</span>
+            </div>
+          </div>
+
+          <!-- Log Expense Form -->
+          <div class="card log-expense-panel" aria-labelledby="log-heading">
+            <h2 class="text-md font-bold" id="log-heading" style="margin-bottom:var(--space-4);">Log an Expense</h2>
+
+            <form class="log-form" id="log-form" novalidate>
+
+              <!-- Amount -->
+              <div class="form-group">
+                <label class="form-label" for="expense-amount">Amount (₹)</label>
+                <div class="amount-input-wrapper">
+                  <span class="amount-currency" aria-hidden="true">₹</span>
+                  <input
+                    class="form-input"
+                    type="number"
+                    id="expense-amount"
+                    placeholder="0"
+                    min="0.01"
+                    step="0.01"
+                    required
+                    aria-label="Expense amount in rupees"
+                  />
+                </div>
+              </div>
+
+              <!-- Category -->
+              <div class="form-group">
+                <span class="form-label" id="category-label">Category</span>
+                <div class="category-selector" role="group" aria-labelledby="category-label">
+                  <button type="button" class="category-btn" data-cat="food" aria-pressed="true" aria-label="Food category">
+                    <span class="category-btn__icon">🍔</span>
+                    <span class="category-btn__label">Food</span>
+                  </button>
+                  <button type="button" class="category-btn" data-cat="transit" aria-pressed="false" aria-label="Transit category">
+                    <span class="category-btn__icon">🚌</span>
+                    <span class="category-btn__label">Transit</span>
+                  </button>
+                  <button type="button" class="category-btn" data-cat="fun" aria-pressed="false" aria-label="Fun category">
+                    <span class="category-btn__icon">🎉</span>
+                    <span class="category-btn__label">Fun</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Note -->
+              <div class="form-group">
+                <label class="form-label" for="expense-note">Note <span class="text-muted font-normal">(optional)</span></label>
+                <input
+                  class="form-input"
+                  type="text"
+                  id="expense-note"
+                  placeholder="e.g. Lunch at canteen"
+                  maxlength="80"
+                />
+              </div>
+
+              <button class="btn btn--primary btn--full" type="submit" id="log-expense-btn">
+                Log Expense
+              </button>
+            </form>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
+
+</div>
+
+<script type="module">
+  import { initDashboard } from './js/dashboard.js';
+  initDashboard().catch(console.error);
+
+  // Greeting
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const greetEl = document.getElementById('nav-greeting');
+  if (greetEl) greetEl.textContent = greeting + '!';
+</script>
+
+</body>
+</html>
