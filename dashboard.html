@@ -252,16 +252,7 @@
 
 </div>
 
-<script type="module">
-  import { initDashboard } from './js/dashboard.js';
-  initDashboard().catch(console.error);
-
-  // Greeting
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  const greetEl = document.getElementById('nav-greeting');
-  if (greetEl) greetEl.textContent = greeting + '!';
-</script>
+<script src="js/dashboard-init.js"></script>
 
 </body>
 </html>

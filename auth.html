@@ -9,6 +9,11 @@
 
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/auth.css" />
+
+  <!-- Make form visible immediately — no JS needed for layout -->
+  <style>
+    .auth-form-box { opacity: 1 !important; transform: none !important; }
+  </style>
 </head>
 <body>
 
@@ -50,12 +55,11 @@
 
   <!-- ── Right: Form Panel ──────────────────────────── -->
   <main class="auth-form-panel" aria-labelledby="auth-form-heading">
-    <div class="auth-form-box page-fade">
+    <!-- visible class added directly — no JS dependency for visibility -->
+    <div class="auth-form-box page-fade visible" id="auth-form-heading" aria-live="polite">
 
-      <div id="auth-form-heading" aria-live="polite">
-        <h2 class="auth-form-box__title">Welcome back 👋</h2>
-        <p class="auth-form-box__sub">Log in or create a free account below.</p>
-      </div>
+      <h2 class="auth-form-box__title">Welcome back 👋</h2>
+      <p class="auth-form-box__sub">Log in or create a free account below.</p>
 
       <!-- Tab Switcher -->
       <div class="auth-tabs" role="tablist" aria-label="Login or Sign up">
@@ -216,12 +220,148 @@
   </main>
 </div>
 
-<script type="module">
-  import { initAuthPage } from './js/auth.js';
-  // Module scripts run after DOM is parsed — DOMContentLoaded has already
-  // fired by this point, so call directly instead of using addEventListener.
-  document.querySelector('.page-fade').classList.add('visible');
-  initAuthPage().catch(console.error);
+<!--
+  Single self-contained script — no module imports, no async loading issues.
+  Uses localStorage for demo mode (no Firebase needed).
+-->
+<script>
+(function () {
+  'use strict';
+
+  // ── LocalStorage helpers ──────────────────────────────
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }
+  function lsSet(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+  function lsDel(k) { localStorage.removeItem(k); }
+
+  // ── Check if already logged in ────────────────────────
+  const session = lsGet('ss_session');
+  if (session && session.uid) {
+    window.location.href = 'dashboard.html';
+    return;
+  }
+
+  // ── Tabs ──────────────────────────────────────────────
+  const tabLogin  = document.getElementById('tab-login');
+  const tabSignup = document.getElementById('tab-signup');
+  const secLogin  = document.getElementById('section-login');
+  const secSignup = document.getElementById('section-signup');
+  const forgotPanel = document.getElementById('forgot-panel');
+
+  tabLogin.addEventListener('click', () => switchTab('login'));
+  tabSignup.addEventListener('click', () => switchTab('signup'));
+
+  function switchTab(tab) {
+    tabLogin.classList.toggle('active', tab === 'login');
+    tabSignup.classList.toggle('active', tab === 'signup');
+    tabLogin.setAttribute('aria-selected', tab === 'login');
+    tabSignup.setAttribute('aria-selected', tab === 'signup');
+    secLogin.classList.toggle('active', tab === 'login');
+    secSignup.classList.toggle('active', tab === 'signup');
+    forgotPanel.classList.remove('visible');
+  }
+
+  // ── Alert helper ──────────────────────────────────────
+  function showAlert(el, msg, type) {
+    el.textContent = msg;
+    el.className = 'alert alert--' + (type || 'error') + ' visible';
+    setTimeout(() => el.classList.remove('visible'), 5000);
+  }
+
+  function setLoading(btn, spinner, on) {
+    btn.disabled = on;
+    spinner.classList.toggle('visible', on);
+    btn.querySelector('.btn-text').style.opacity = on ? '0' : '1';
+  }
+
+  function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+  // ── Login ─────────────────────────────────────────────
+  const loginAlert   = document.getElementById('login-alert');
+  const loginBtn     = document.getElementById('login-btn');
+  const loginSpinner = document.getElementById('login-spinner');
+
+  document.getElementById('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-password').value;
+    if (!validateEmail(email)) { showAlert(loginAlert, 'Please enter a valid email address.'); return; }
+    if (pass.length < 6) { showAlert(loginAlert, 'Password must be at least 6 characters.'); return; }
+
+    setLoading(loginBtn, loginSpinner, true);
+    setTimeout(function () {
+      const users = lsGet('ss_users') || {};
+      const u = users[email];
+      if (!u) { setLoading(loginBtn, loginSpinner, false); showAlert(loginAlert, 'No account found with this email.'); return; }
+      if (u.password !== pass) { setLoading(loginBtn, loginSpinner, false); showAlert(loginAlert, 'Incorrect password. Please try again.'); return; }
+      lsSet('ss_session', { uid: u.uid, email: email });
+      window.location.href = 'dashboard.html';
+    }, 600);
+  });
+
+  // ── Sign Up ───────────────────────────────────────────
+  const signupAlert   = document.getElementById('signup-alert');
+  const signupBtn     = document.getElementById('signup-btn');
+  const signupSpinner = document.getElementById('signup-spinner');
+
+  document.getElementById('signup-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const email   = document.getElementById('signup-email').value.trim();
+    const pass    = document.getElementById('signup-password').value;
+    const confirm = document.getElementById('signup-confirm').value;
+    if (!validateEmail(email)) { showAlert(signupAlert, 'Please enter a valid email address.'); return; }
+    if (pass.length < 6) { showAlert(signupAlert, 'Password must be at least 6 characters.'); return; }
+    if (pass !== confirm) { showAlert(signupAlert, 'Passwords do not match.'); return; }
+
+    setLoading(signupBtn, signupSpinner, true);
+    setTimeout(function () {
+      const users = lsGet('ss_users') || {};
+      if (users[email]) { setLoading(signupBtn, signupSpinner, false); showAlert(signupAlert, 'An account already exists with this email.'); return; }
+      const uid = 'uid_' + Math.random().toString(36).slice(2, 10);
+      users[email] = { password: pass, uid: uid };
+      lsSet('ss_users', users);
+      lsSet('ss_session', { uid: uid, email: email });
+      window.location.href = 'dashboard.html';
+    }, 600);
+  });
+
+  // ── Forgot Password ───────────────────────────────────
+  const forgotLink    = document.getElementById('forgot-link');
+  const forgotBack    = document.getElementById('forgot-back');
+  const forgotAlert   = document.getElementById('forgot-alert');
+  const forgotBtn     = document.getElementById('forgot-btn');
+  const forgotSpinner = document.getElementById('forgot-spinner');
+
+  forgotLink.addEventListener('click', function () {
+    secLogin.classList.remove('active');
+    forgotPanel.classList.add('visible');
+  });
+  forgotBack.addEventListener('click', function () {
+    forgotPanel.classList.remove('visible');
+    secLogin.classList.add('active');
+  });
+
+  document.getElementById('forgot-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const email = document.getElementById('forgot-email').value.trim();
+    if (!validateEmail(email)) { showAlert(forgotAlert, 'Please enter a valid email address.'); return; }
+    setLoading(forgotBtn, forgotSpinner, true);
+    setTimeout(function () {
+      setLoading(forgotBtn, forgotSpinner, false);
+      showAlert(forgotAlert, 'If this email exists, a reset link was sent! (Demo mode — no real email sent)', 'success');
+    }, 600);
+  });
+
+  // ── Password toggles ──────────────────────────────────
+  document.querySelectorAll('.input-group__toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const input = btn.closest('.input-group').querySelector('input');
+      const isText = input.type === 'text';
+      input.type = isText ? 'password' : 'text';
+      btn.textContent = isText ? '👁️' : '🙈';
+    });
+  });
+
+})();
 </script>
 
 </body>

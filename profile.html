@@ -135,19 +135,89 @@
   <div class="toast-container" id="toast-container" role="status" aria-live="polite"></div>
 </div>
 
-<script type="module">
-  import { initProfile } from './js/dashboard.js';
-  import { getFirebase } from './js/firebase-config.js';
+<script>
+(function () {
+  'use strict';
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }
+  function lsSet(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+  function lsDel(k)  { localStorage.removeItem(k); }
+  function pathKey() { return 'ss_fs_' + Array.from(arguments).join('/'); }
 
-  (async () => {
-    await initProfile();
-    const { auth } = await getFirebase();
-    const user = auth.currentUser;
-    if (user) {
-      document.getElementById('profile-email').textContent = user.email;
-      document.getElementById('profile-avatar').textContent = user.email[0].toUpperCase();
+  var session = lsGet('ss_session');
+  if (!session || !session.uid) { window.location.href = 'auth.html'; return; }
+  var uid   = session.uid;
+  var email = session.email;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Show page
+    var page = document.querySelector('.dashboard-page');
+    if (page) page.classList.add('visible');
+
+    // Nav
+    var avatarEl   = document.getElementById('user-avatar');
+    var emailEl    = document.getElementById('nav-user-email');
+    var signoutBtn = document.getElementById('nav-signout');
+    var dropdown   = document.getElementById('user-dropdown');
+    if (emailEl)  emailEl.textContent  = email;
+    if (avatarEl) avatarEl.textContent = email[0].toUpperCase();
+    if (avatarEl && dropdown) {
+      avatarEl.addEventListener('click', function (e) { e.stopPropagation(); dropdown.classList.toggle('open'); });
+      document.addEventListener('click', function () { dropdown.classList.remove('open'); });
     }
-  })().catch(console.error);
+    if (signoutBtn) signoutBtn.addEventListener('click', function () { lsDel('ss_session'); window.location.href = 'index.html'; });
+
+    // Profile display
+    var profileEmail  = document.getElementById('profile-email');
+    var profileAvatar = document.getElementById('profile-avatar');
+    if (profileEmail)  profileEmail.textContent  = email;
+    if (profileAvatar) profileAvatar.textContent = email[0].toUpperCase();
+
+    // Load profile
+    var profileKey  = pathKey('users', uid, 'profile', 'data');
+    var userProfile = lsGet(profileKey);
+
+    // Update allowance form
+    var form  = document.getElementById('update-allowance-form');
+    var input = document.getElementById('new-allowance');
+    if (form && input) {
+      if (userProfile) input.value = userProfile.allowance;
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var amount = parseFloat(input.value);
+        if (!amount || amount <= 0) { showAlert('Enter a valid amount', 'error'); return; }
+        var now = new Date();
+        userProfile = { allowance: amount, month: now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') };
+        lsSet(profileKey, userProfile);
+        showAlert('Allowance updated! ✓', 'success');
+      });
+    }
+
+    // Reset expenses
+    var resetBtn = document.getElementById('reset-month-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        if (!confirm('Delete all expenses for this month? Your allowance setting will be kept.')) return;
+        var colKey = pathKey('users', uid, 'expenses');
+        var ids    = lsGet(colKey + '/__ids__') || [];
+        ids.forEach(function (id) { lsDel(pathKey('users', uid, 'expenses', id)); });
+        lsDel(colKey + '/__ids__');
+        showAlert('All expenses cleared! ✓', 'success');
+      });
+    }
+
+    // Sign out button on profile page
+    var profileSignout = document.getElementById('profile-signout');
+    if (profileSignout) profileSignout.addEventListener('click', function () { lsDel('ss_session'); window.location.href = 'index.html'; });
+
+    function showAlert(msg, type) {
+      var el = document.getElementById('profile-alert');
+      if (!el) return;
+      el.textContent = msg;
+      el.className   = 'alert alert--' + type + ' visible';
+      setTimeout(function () { el.classList.remove('visible'); }, 4000);
+    }
+  });
+})();
 </script>
 
 </body>
