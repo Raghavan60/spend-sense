@@ -79,10 +79,7 @@
           <section class="card budget-overview" aria-labelledby="budget-overview-heading">
             <div class="budget-overview__top">
               <h2 class="text-md font-bold" id="budget-overview-heading">Budget Overview</h2>
-              <div style="display:flex;align-items:center;gap:var(--space-2);">
-                <span class="budget-month" id="budget-month" aria-live="polite">—</span>
-                <button class="update-allowance-btn" id="update-allowance-btn" title="Update monthly allowance" aria-label="Update monthly allowance">✏️ Update</button>
-              </div>
+              <span class="budget-month" id="budget-month" aria-live="polite">—</span>
             </div>
 
             <div class="budget-stats" role="list">
@@ -110,6 +107,12 @@
                 <div class="progress-fill" id="budget-progress-fill" style="width:0%"></div>
               </div>
             </div>
+
+            <!-- Update Allowance Button -->
+            <button class="update-allowance-btn--big" id="update-allowance-btn" aria-label="Update monthly allowance">
+              <span class="update-allowance-btn__icon">✏️</span>
+              <span>Update Monthly Allowance</span>
+            </button>
           </section>
 
           <!-- Category Breakdown -->
