@@ -137,10 +137,11 @@
 
 <script type="module">
   import { initProfile } from './js/dashboard.js';
-  import { auth } from './js/firebase-config.js';
+  import { getFirebase } from './js/firebase-config.js';
 
   (async () => {
     await initProfile();
+    const { auth } = await getFirebase();
     const user = auth.currentUser;
     if (user) {
       document.getElementById('profile-email').textContent = user.email;

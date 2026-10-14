@@ -218,10 +218,10 @@
 
 <script type="module">
   import { initAuthPage } from './js/auth.js';
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('.page-fade').classList.add('visible');
-    initAuthPage();
-  });
+  // Module scripts run after DOM is parsed — DOMContentLoaded has already
+  // fired by this point, so call directly instead of using addEventListener.
+  document.querySelector('.page-fade').classList.add('visible');
+  initAuthPage().catch(console.error);
 </script>
 
 </body>
