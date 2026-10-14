@@ -79,7 +79,10 @@
           <section class="card budget-overview" aria-labelledby="budget-overview-heading">
             <div class="budget-overview__top">
               <h2 class="text-md font-bold" id="budget-overview-heading">Budget Overview</h2>
-              <span class="budget-month" id="budget-month" aria-live="polite">—</span>
+              <div style="display:flex;align-items:center;gap:var(--space-2);">
+                <span class="budget-month" id="budget-month" aria-live="polite">—</span>
+                <button class="update-allowance-btn" id="update-allowance-btn" title="Update monthly allowance" aria-label="Update monthly allowance">✏️ Update</button>
+              </div>
             </div>
 
             <div class="budget-stats" role="list">
@@ -249,6 +252,24 @@
 
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Update Allowance Modal -->
+  <div class="modal-overlay" id="update-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">💰 Update Monthly Allowance</h3>
+        <button class="modal-close" id="modal-close" aria-label="Close modal">✕</button>
+      </div>
+      <p class="modal-desc">Enter your new monthly allowance amount. This updates your daily safe-to-spend limit.</p>
+      <div class="modal-form">
+        <div class="amount-input-wrapper">
+          <span class="amount-currency" aria-hidden="true">₹</span>
+          <input class="form-input" type="number" id="update-allowance-input" placeholder="e.g. 6000" min="1" step="100" aria-label="New monthly allowance" />
+        </div>
+        <button class="btn btn--primary btn--full" id="update-allowance-save" style="margin-top:var(--space-4);">Save New Allowance</button>
+      </div>
+    </div>
+  </div>
 
 </div>
 

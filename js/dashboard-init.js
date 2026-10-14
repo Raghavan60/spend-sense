@@ -33,6 +33,7 @@
     loadExpenses();
     setupLogForm();
     setupBanner();
+    setupUpdateAllowanceModal();
 
     // Greeting
     const hour = new Date().getHours();
@@ -286,7 +287,45 @@
     }, 3000);
   }
 
+  // ── Update Allowance Modal ────────────────────────────────
+  function setupUpdateAllowanceModal() {
+    var openBtn  = document.getElementById('update-allowance-btn');
+    var modal    = document.getElementById('update-modal');
+    var closeBtn = document.getElementById('modal-close');
+    var input    = document.getElementById('update-allowance-input');
+    var saveBtn  = document.getElementById('update-allowance-save');
+    if (!openBtn || !modal) return;
+
+    function openModal() {
+      if (userProfile && userProfile.allowance) input.value = userProfile.allowance;
+      else input.value = '';
+      modal.classList.add('open');
+      setTimeout(function () { input.focus(); input.select(); }, 200);
+    }
+    function closeModal() { modal.classList.remove('open'); }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+    });
+
+    saveBtn.addEventListener('click', function () {
+      var amount = parseFloat(input.value);
+      if (!amount || amount <= 0) { showToast('Please enter a valid amount', 'error'); input.focus(); return; }
+      saveBtn.disabled    = true;
+      saveBtn.textContent = 'Saving…';
+      saveAllowance(amount);
+      saveBtn.disabled    = false;
+      saveBtn.textContent = 'Save New Allowance';
+      closeModal();
+    });
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') saveBtn.click(); });
+  }
+
   // ── Helpers ────────────────────────────────────────────────
+
   function fmt(n) {
     if (isNaN(n) || n === undefined) return '₹0';
     return '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
