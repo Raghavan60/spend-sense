@@ -1,8 +1,7 @@
 // =========================================================
 // Spend Sense — Firebase Configuration + Auto Demo Mode
 // =========================================================
-// If API keys are placeholders → runs in DEMO MODE (localStorage)
-// If API keys are filled in    → runs with real Firebase
+// No top-level await — safe for GitHub Pages and all browsers
 // =========================================================
 
 const firebaseConfig = {
@@ -14,82 +13,51 @@ const firebaseConfig = {
   appId:             "REPLACE_WITH_YOUR_APP_ID"
 };
 
-// ── Auto-detect Demo Mode ──────────────────────────────
 const IS_DEMO = firebaseConfig.apiKey.startsWith('REPLACE');
 
-let auth, db;
-let createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged,
-    sendPasswordResetEmail,
-    doc, collection, getDoc, setDoc,
-    addDoc, deleteDoc, getDocs,
-    query, orderBy, onSnapshot,
-    serverTimestamp;
+// Cached promise — only loads once
+let _promise = null;
 
-if (IS_DEMO) {
-  // ── DEMO MODE: use localStorage mock ─────────────────
-  console.info('%c⚡ Spend Sense running in DEMO MODE (localStorage)', 'color:#3D8B6B;font-weight:bold');
-  console.info('Add your Firebase keys to js/firebase-config.js to enable real accounts.');
-
-  const local = await import('./local-db.js');
-  auth                          = local.auth;
-  db                            = local.db;
-  createUserWithEmailAndPassword = local.createUserWithEmailAndPassword;
-  signInWithEmailAndPassword    = local.signInWithEmailAndPassword;
-  signOut                       = local.signOut;
-  onAuthStateChanged            = local.onAuthStateChanged;
-  sendPasswordResetEmail        = local.sendPasswordResetEmail;
-  doc                           = local.doc;
-  collection                    = local.collection;
-  getDoc                        = local.getDoc;
-  setDoc                        = local.setDoc;
-  addDoc                        = local.addDoc;
-  deleteDoc                     = local.deleteDoc;
-  getDocs                       = local.getDocs;
-  query                         = local.query;
-  orderBy                       = local.orderBy;
-  onSnapshot                    = local.onSnapshot;
-  serverTimestamp               = local.serverTimestamp;
-
-} else {
-  // ── FIREBASE MODE: use real Firebase ──────────────────
-  const { initializeApp }  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-  const authMod            = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-  const fsMod              = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-
-  const app = initializeApp(firebaseConfig);
-  auth = authMod.getAuth(app);
-  db   = fsMod.getFirestore(app);
-
-  createUserWithEmailAndPassword = authMod.createUserWithEmailAndPassword;
-  signInWithEmailAndPassword    = authMod.signInWithEmailAndPassword;
-  signOut                       = authMod.signOut;
-  onAuthStateChanged            = authMod.onAuthStateChanged;
-  sendPasswordResetEmail        = authMod.sendPasswordResetEmail;
-  doc                           = fsMod.doc;
-  collection                    = fsMod.collection;
-  getDoc                        = fsMod.getDoc;
-  setDoc                        = fsMod.setDoc;
-  addDoc                        = fsMod.addDoc;
-  deleteDoc                     = fsMod.deleteDoc;
-  getDocs                       = fsMod.getDocs;
-  query                         = fsMod.query;
-  orderBy                       = fsMod.orderBy;
-  onSnapshot                    = fsMod.onSnapshot;
-  serverTimestamp               = fsMod.serverTimestamp;
+export function getFirebase() {
+  if (_promise) return _promise;
+  _promise = IS_DEMO ? _loadDemo() : _loadFirebase();
+  return _promise;
 }
 
-export {
-  auth, db,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  doc, collection, getDoc, setDoc,
-  addDoc, deleteDoc, getDocs,
-  query, orderBy, onSnapshot,
-  serverTimestamp
-};
+async function _loadDemo() {
+  console.info('%c⚡ Spend Sense — DEMO MODE (localStorage)', 'color:#3D8B6B;font-weight:bold');
+  const m = await import('./local-db.js');
+  return {
+    auth: m.auth, db: m.db,
+    createUserWithEmailAndPassword:  m.createUserWithEmailAndPassword,
+    signInWithEmailAndPassword:      m.signInWithEmailAndPassword,
+    signOut:                         m.signOut,
+    onAuthStateChanged:              m.onAuthStateChanged,
+    sendPasswordResetEmail:          m.sendPasswordResetEmail,
+    doc: m.doc, collection: m.collection,
+    getDoc: m.getDoc, setDoc: m.setDoc,
+    addDoc: m.addDoc, deleteDoc: m.deleteDoc, getDocs: m.getDocs,
+    query: m.query, orderBy: m.orderBy,
+    onSnapshot: m.onSnapshot, serverTimestamp: m.serverTimestamp,
+  };
+}
+
+async function _loadFirebase() {
+  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+  const a = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+  const f = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const app = initializeApp(firebaseConfig);
+  return {
+    auth: a.getAuth(app), db: f.getFirestore(app),
+    createUserWithEmailAndPassword:  a.createUserWithEmailAndPassword,
+    signInWithEmailAndPassword:      a.signInWithEmailAndPassword,
+    signOut:                         a.signOut,
+    onAuthStateChanged:              a.onAuthStateChanged,
+    sendPasswordResetEmail:          a.sendPasswordResetEmail,
+    doc: f.doc, collection: f.collection,
+    getDoc: f.getDoc, setDoc: f.setDoc,
+    addDoc: f.addDoc, deleteDoc: f.deleteDoc, getDocs: f.getDocs,
+    query: f.query, orderBy: f.orderBy,
+    onSnapshot: f.onSnapshot, serverTimestamp: f.serverTimestamp,
+  };
+}

@@ -2,14 +2,7 @@
 // Spend Sense — Authentication Logic
 // =========================================================
 
-import {
-  auth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  sendPasswordResetEmail
-} from './firebase-config.js';
+import { getFirebase } from './firebase-config.js';
 
 // ── Utility Helpers ──────────────────────────────────────
 function showAlert(el, message, type = 'error') {
@@ -29,7 +22,8 @@ function validateEmail(email) {
 }
 
 // ── Auth State Guard ─────────────────────────────────────
-export function requireAuth(redirectTo = 'auth.html') {
+export async function requireAuth(redirectTo = 'auth.html') {
+  const { auth, onAuthStateChanged } = await getFirebase();
   return new Promise((resolve, reject) => {
     const unsub = onAuthStateChanged(auth, (user) => {
       unsub();
@@ -43,15 +37,27 @@ export function requireAuth(redirectTo = 'auth.html') {
   });
 }
 
-export function redirectIfLoggedIn(redirectTo = 'dashboard.html') {
+export async function redirectIfLoggedIn(redirectTo = 'dashboard.html') {
+  const { auth, onAuthStateChanged } = await getFirebase();
   onAuthStateChanged(auth, (user) => {
     if (user) window.location.href = redirectTo;
   });
 }
 
 // ── Auth Page Logic ──────────────────────────────────────
-export function initAuthPage() {
-  redirectIfLoggedIn();
+export async function initAuthPage() {
+  const {
+    auth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    sendPasswordResetEmail
+  } = await getFirebase();
+
+  // Redirect if already logged in
+  onAuthStateChanged(auth, (user) => {
+    if (user) window.location.href = 'dashboard.html';
+  });
 
   const tabLogin      = document.getElementById('tab-login');
   const tabSignup     = document.getElementById('tab-signup');
@@ -165,11 +171,13 @@ export function initAuthPage() {
 
 // ── Sign Out ─────────────────────────────────────────────
 export async function signOutUser() {
+  const { auth, signOut } = await getFirebase();
   await signOut(auth);
   window.location.href = 'index.html';
 }
 
-export function getCurrentUser() {
+export async function getCurrentUser() {
+  const { auth } = await getFirebase();
   return auth.currentUser;
 }
 

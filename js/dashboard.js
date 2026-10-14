@@ -2,20 +2,15 @@
 // Spend Sense — Dashboard Logic
 // =========================================================
 
-import {
-  auth, db,
-  doc, collection, getDoc, setDoc,
-  addDoc, deleteDoc, getDocs,
-  query, orderBy, onSnapshot,
-  serverTimestamp, onAuthStateChanged
-} from './firebase-config.js';
+import { getFirebase } from './firebase-config.js';
 import { requireAuth, signOutUser } from './auth.js';
 
 // ── State ─────────────────────────────────────────────────
-let currentUser  = null;
-let userProfile  = null;
-let expenses     = [];
+let currentUser   = null;
+let userProfile   = null;
+let expenses      = [];
 let unsubExpenses = null;
+let _fb           = null; // firebase bindings
 
 // ── Category Config ────────────────────────────────────────
 const CATEGORIES = {
@@ -26,6 +21,7 @@ const CATEGORIES = {
 
 // ── Init Dashboard ─────────────────────────────────────────
 export async function initDashboard() {
+  _fb         = await getFirebase();
   currentUser = await requireAuth();
   setupNav();
   await loadProfile();
@@ -37,10 +33,10 @@ export async function initDashboard() {
 
 // ── Nav ────────────────────────────────────────────────────
 function setupNav() {
-  const avatarEl   = document.getElementById('user-avatar');
-  const dropdown   = document.getElementById('user-dropdown');
-  const emailEl    = document.getElementById('nav-user-email');
-  const signoutBtn = document.getElementById('nav-signout');
+  const avatarEl    = document.getElementById('user-avatar');
+  const dropdown    = document.getElementById('user-dropdown');
+  const emailEl     = document.getElementById('nav-user-email');
+  const signoutBtn  = document.getElementById('nav-signout');
   const profileLink = document.getElementById('nav-profile');
 
   if (emailEl)  emailEl.textContent  = currentUser.email;
@@ -58,6 +54,7 @@ function setupNav() {
 
 // ── Load Profile ───────────────────────────────────────────
 async function loadProfile() {
+  const { db, doc, getDoc } = _fb;
   const ref  = doc(db, 'users', currentUser.uid, 'profile', 'data');
   const snap = await getDoc(ref);
   if (snap.exists()) {
@@ -86,13 +83,14 @@ function setupSetupBanner() {
     btn.textContent = 'Saving…';
     await saveAllowance(amount);
     btn.disabled    = false;
-    btn.textContent = 'Save';
+    btn.textContent = 'Save Allowance';
   });
 
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') btn.click(); });
 }
 
 async function saveAllowance(amount) {
+  const { db, doc, setDoc, serverTimestamp } = _fb;
   const now = new Date();
   userProfile = {
     allowance:  amount,
@@ -110,6 +108,7 @@ function hideBanner()  { document.getElementById('setup-banner').classList.remov
 
 // ── Expense Subscription ────────────────────────────────────
 function subscribeExpenses() {
+  const { db, collection, query, orderBy, onSnapshot } = _fb;
   if (unsubExpenses) unsubExpenses();
   const colRef = collection(db, 'users', currentUser.uid, 'expenses');
   const q      = query(colRef, orderBy('timestamp', 'desc'));
@@ -149,11 +148,12 @@ function setupLogForm() {
     const amount = parseFloat(amountInput.value);
     if (!amount || amount <= 0) { showToast('Enter a valid amount', 'error'); amountInput.focus(); return; }
 
-    const submitBtn     = document.getElementById('log-expense-btn');
-    submitBtn.disabled  = true;
+    const submitBtn      = document.getElementById('log-expense-btn');
+    submitBtn.disabled   = true;
     submitBtn.textContent = 'Logging…';
 
     try {
+      const { db, collection, addDoc, serverTimestamp } = _fb;
       const now = new Date();
       await addDoc(collection(db, 'users', currentUser.uid, 'expenses'), {
         amount,
@@ -178,6 +178,7 @@ function setupLogForm() {
 // ── Delete Expense ──────────────────────────────────────────
 async function deleteExpense(id) {
   try {
+    const { db, doc, deleteDoc } = _fb;
     await deleteDoc(doc(db, 'users', currentUser.uid, 'expenses', id));
     showToast('Expense removed', 'success');
   } catch (err) {
@@ -210,7 +211,6 @@ function updateBudgetUI() {
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   setEl('budget-month', `${months[now.getMonth()]} ${now.getFullYear()}`);
 
-  // Progress bar
   const pct  = totalAllowance > 0 ? Math.min(100, (totalSpent / totalAllowance) * 100) : 0;
   const fill = document.getElementById('budget-progress-fill');
   if (fill) {
@@ -221,13 +221,12 @@ function updateBudgetUI() {
   }
   setEl('budget-pct', `${Math.round(pct)}% used`);
 
-  // Category bars
   const cats = { food: 0, transit: 0, fun: 0 };
   monthExp.forEach(e => { if (e.category in cats) cats[e.category] += e.amount; });
 
   Object.keys(cats).forEach(cat => {
-    const barEl = document.getElementById(`cat-bar-${cat}`);
-    const amtEl = document.getElementById(`cat-amt-${cat}`);
+    const barEl  = document.getElementById(`cat-bar-${cat}`);
+    const amtEl  = document.getElementById(`cat-amt-${cat}`);
     const pctCat = totalSpent > 0 ? (cats[cat] / totalSpent) * 100 : 0;
     if (barEl) barEl.style.width = `${pctCat}%`;
     if (amtEl) amtEl.textContent = formatCurrency(cats[cat]);
@@ -297,6 +296,7 @@ window._delExp = deleteExpense;
 
 // ── Profile Page ─────────────────────────────────────────────
 export async function initProfile() {
+  _fb         = await getFirebase();
   currentUser = await requireAuth();
   setupProfileNav();
   await loadProfile();
@@ -321,7 +321,6 @@ function setupProfileNav() {
 }
 
 function setupProfileForms() {
-  // Update allowance
   const form  = document.getElementById('update-allowance-form');
   const input = document.getElementById('new-allowance');
   if (form && input) {
@@ -335,7 +334,6 @@ function setupProfileForms() {
     });
   }
 
-  // Reset expenses
   const resetBtn = document.getElementById('reset-month-btn');
   if (resetBtn) {
     resetBtn.addEventListener('click', async () => {
@@ -343,6 +341,7 @@ function setupProfileForms() {
       resetBtn.disabled    = true;
       resetBtn.textContent = 'Resetting…';
       try {
+        const { db, collection, getDocs, query, doc, deleteDoc } = _fb;
         const colRef = collection(db, 'users', currentUser.uid, 'expenses');
         const snap   = await getDocs(query(colRef));
         await Promise.all(snap.docs.map(d => deleteDoc(doc(db, 'users', currentUser.uid, 'expenses', d.id))));
@@ -359,7 +358,6 @@ function setupProfileForms() {
   const profileSignout = document.getElementById('profile-signout');
   if (profileSignout) profileSignout.addEventListener('click', signOutUser);
 
-  // Show email in profile page
   const profileEmail  = document.getElementById('profile-email');
   const profileAvatar = document.getElementById('profile-avatar');
   if (profileEmail)  profileEmail.textContent  = currentUser.email;
